@@ -18,13 +18,20 @@ using System.Collections.Generic;
 public class Spawner : MonoBehaviour {
 	public List<Transform> spawn_locations_ = new List<Transform>();
 
-	float spawn_timer_ = 5.0f;
+    float spawn_timer_ = 5.0f;
+    ObjectPool duckPool;
+    ObjectPool leafPool;
 
-	void Awake() {
+    void Awake() {
+        // Hide all of the spawn point meshes when the game starts
 		foreach (var transform in spawn_locations_) {
 			transform.GetComponentInParent<MeshRenderer> ().enabled = false;
 		}
-	}
+
+        // Make sure the pool object is tagged appropriately in the editor, (FindWithTag is quicker than Find using strings)
+        duckPool = GameObject.FindWithTag("DuckPool").GetComponent<ObjectPool>();
+        leafPool = GameObject.FindWithTag("LeafParticlePool").GetComponent<ObjectPool>();
+    }
 
 	void Start() {
 		spawn_timer_ = Random.Range(0.2f, 5.0f);
@@ -40,8 +47,10 @@ public class Spawner : MonoBehaviour {
 				int spawn_pos_index = Random.Range(0, spawn_locations_.Count);
 				Transform at = spawn_locations_[spawn_pos_index];
 
-				DuckPool.Create(at);
-			}
+                // Spawn an enemy and a particle effect at the spawn point
+                duckPool.Create(at.position);
+                leafPool.Create(at.position);
+            }
 		}
 
 	}

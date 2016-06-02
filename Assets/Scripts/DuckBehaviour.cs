@@ -50,7 +50,9 @@ public class DuckBehaviour : MonoBehaviour {
 				if (rigidbody != null) {
 					rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
 				}
-				DuckPool.Destroy(gameObject);
+                // Make sure the pool object is tagged appropriately in the editor, (FindWithTag is quicker than Find using strings)
+                ObjectPool pool = GameObject.FindWithTag("DuckPool").GetComponent<ObjectPool>();
+                pool.Destroy(gameObject);
 			}
 		} else if (NextNode != null) {
 			Vector3 pos = transform.position;
@@ -104,7 +106,9 @@ public class DuckBehaviour : MonoBehaviour {
 */
 	// Spawns some particles and hides the duck
 	public void OnShot() {
-		ParticlePool.Create(transform);
+        // Make sure the pool object is tagged appropriately in the editor, (FindWithTag is quicker than Find using strings)
+        ObjectPool pool = GameObject.FindWithTag("HitParticlePool").GetComponent<ObjectPool>();
+        pool.Create(transform.position);
 
 		death_timer_ = 0.25f;
 
