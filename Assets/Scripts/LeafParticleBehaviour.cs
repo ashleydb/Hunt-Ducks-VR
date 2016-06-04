@@ -5,8 +5,11 @@ public class LeafParticleBehaviour : MonoBehaviour
 {
     float death_timer_ = -5.0f;
 
+	private GvrAudioSource audio_source_;
+
 	void OnEnable() {
 		death_timer_ = 5.0f;
+		PlaySound ();
 	}
 
 	void Update ()
@@ -19,6 +22,14 @@ public class LeafParticleBehaviour : MonoBehaviour
                 pool.Destroy(gameObject);
 			}
 		}
+	}
+
+	void PlaySound() {
+		if (audio_source_ == null)
+			return;
+
+		audio_source_.loop = false;
+		audio_source_.Play();
 	}
 }
 

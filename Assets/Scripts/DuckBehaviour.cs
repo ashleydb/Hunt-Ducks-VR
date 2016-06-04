@@ -19,31 +19,32 @@ using System.Collections.Generic;
 public class DuckBehaviour : MonoBehaviour {
 	public float speed_ = 2.0f;
 	public float death_timer_ = -1.0f;
+	public float talk_timer_ = -1.0f;
 	public float node_threshold = 0.5f;
 	public Waypoint NextNode;
 
-	public List<AudioClip> near_impact_sounds_ = new List<AudioClip>();
-	public List<AudioClip> impact_sounds_ = new List<AudioClip>();
-	public List<AudioClip> attack_sounds_ = new List<AudioClip>();
-	public List<AudioClip> charge_sounds_ = new List<AudioClip>();
-	public List<AudioClip> walk_sounds_ = new List<AudioClip>();
+	public List<AudioClip> spawn_sounds_ = new List<AudioClip>();	// Duck appears
+	public List<AudioClip> hit_sounds_ = new List<AudioClip>();		// Duck shot
+	public List<AudioClip> talk_sounds_ = new List<AudioClip>();	// Occassional quacking while flying
 
 	private GvrAudioSource audio_source_;
 
 	void OnEnable() {
 		audio_source_ = GetComponent<GvrAudioSource>();
 		NextNode = FindNearestWaypoint();
+		talk_timer_ = Random.Range (7, 15); // Make the duck quack as it flies after some amount of time
 		StartCoroutine(PlayAwakeSound());
 	}
 
 	IEnumerator PlayAwakeSound() {
 		yield return new WaitForEndOfFrame();
 
-		PlaySound(charge_sounds_);
+		PlaySound(spawn_sounds_);
 	}
 
 	void Update() {
 		if (death_timer_ > 0.0f) {
+			// Duck is dying so remove from scene after some time
 			death_timer_ -= Time.deltaTime;
 			if (death_timer_ <= 0.0f) {
 				Rigidbody rigidbody = GetComponent<Rigidbody>();
@@ -55,6 +56,7 @@ public class DuckBehaviour : MonoBehaviour {
                 pool.Destroy(gameObject);
 			}
 		} else if (NextNode != null) {
+			// Duck is flying, so point it in the right direction
 			Vector3 pos = transform.position;
 			Vector3 target_pos = NextNode.transform.position;
 
@@ -65,11 +67,22 @@ public class DuckBehaviour : MonoBehaviour {
 			transform.LookAt(target_pos);
 			//FixHeight();
 
+			// We're close enough to the next waypoint to start heading to another one
 			if (Vector3.Distance(transform.position, target_pos) <= node_threshold) {
 				if (NextNode.Next.Count > 0) {
 					NextNode = NextNode.Next[0];
 				} else {
 					NextNode = null;
+				}
+			}
+
+			// Should the duck quack yet?
+			if (talk_timer_ > 0.0f) {
+				talk_timer_ -= Time.deltaTime;
+				if (talk_timer_ <= 0.0f) {
+					PlaySound (talk_sounds_);
+					// Reset so the duck quacks again after some time
+					talk_timer_ = Random.Range (3, 10);
 				}
 			}
 		}
@@ -112,7 +125,7 @@ public class DuckBehaviour : MonoBehaviour {
 
 		death_timer_ = 0.25f;
 
-		PlaySound(impact_sounds_);
+		PlaySound(hit_sounds_);
 	}
 
 	public Waypoint FindNearestWaypoint() {
@@ -136,18 +149,18 @@ public class DuckBehaviour : MonoBehaviour {
 			transform.position = pos;
 		}
 	}
-
+/*
 	void OnNearImpact() {
 		PlaySound(near_impact_sounds_);
 	}
-
-	void PlaySound(List<AudioClip> sounds) {
+*/
+	void PlaySound(List<AudioClip> sounds, bool looping = false) {
 		if (sounds.Count == 0 || audio_source_ == null)
 			return;
 
 		AudioClip clip = sounds[Random.Range(0, sounds.Count)];
 		audio_source_.clip = clip;
-		audio_source_.loop = false;
+		audio_source_.loop = looping;
 		audio_source_.Play();
 	}
 }
