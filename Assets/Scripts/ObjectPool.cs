@@ -161,7 +161,7 @@ public class ObjectPool : MonoBehaviour
 		{
 			obj.SetActive(false);
 			pool_.Add(obj);
-			active_pool_.Remove(obj);
 		}
+		active_pool_.Clear ();
 	}
 }
