@@ -60,7 +60,7 @@ public class Spawner : MonoBehaviour {
 				Transform at = spawn_locations_[spawn_pos_index];
 
                 // Spawn an enemy and a particle effect at the spawn point
-                duckPool.Create(at.position);
+                duckPool.Create(at);
                 leafPool.Create(at.position);
             }
 		}
