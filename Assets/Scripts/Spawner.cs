@@ -18,7 +18,8 @@ using System.Collections.Generic;
 public class Spawner : MonoBehaviour {
 	public List<Transform> spawn_locations_ = new List<Transform>();
 
-    float spawn_timer_ = 5.0f;
+	int spawnCount = 0;
+    float spawn_timer_ = 0.0f;
     ObjectPool duckPool;
     ObjectPool leafPool;
 
@@ -31,18 +32,29 @@ public class Spawner : MonoBehaviour {
         // Make sure the pool object is tagged appropriately in the editor, (FindWithTag is quicker than Find using strings)
         duckPool = GameObject.FindWithTag("DuckPool").GetComponent<ObjectPool>();
         leafPool = GameObject.FindWithTag("LeafParticlePool").GetComponent<ObjectPool>();
+
+		// Whenever we start spawning characters, this is how long the first will take
+		spawn_timer_ = Random.Range(0.2f, 3.0f);
     }
 
-	void Start() {
-		spawn_timer_ = Random.Range(0.2f, 5.0f);
+	// Call this when starting a game, or after another enemy has been killed to make more appear
+	public void SpawnEntities(int numberToSpawn) {
+		spawnCount += numberToSpawn;
+	}
+
+	public void RemoveAllEntities() {
+		spawnCount = 0;
+		spawn_timer_ = Random.Range(2.0f, 5.0f);
+		duckPool.DestroyAllActive ();
 	}
 
 	void Update() {
-		if (spawn_timer_ > 0.0f) {
+		if (spawnCount > 0 && spawn_timer_ > 0.0f) {
 			spawn_timer_ -= Time.deltaTime;
 
 			if (spawn_timer_ <= 0.0f) {
 				spawn_timer_ = Random.Range(2.0f, 5.0f);
+				--spawnCount;
 
 				int spawn_pos_index = Random.Range(0, spawn_locations_.Count);
 				Transform at = spawn_locations_[spawn_pos_index];

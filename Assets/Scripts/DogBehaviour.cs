@@ -18,12 +18,17 @@ using System.Collections.Generic;
 
 public class DogBehaviour : MonoBehaviour {
 
+	public GameObject menu_;
+	public GameObject leftButton_;
+	public GameObject rightButton_;
+
 	public List<AudioClip> attention_sounds_ = new List<AudioClip>();
 	public List<AudioClip> select_sounds_ = new List<AudioClip>();
 
 	private GvrAudioSource audio_source_;
 
 	void OnEnable() {
+		menu_.SetActive (false);
 		audio_source_ = GetComponent<GvrAudioSource>();
 		StartCoroutine(PlayAwakeSound());
 	}
@@ -35,14 +40,40 @@ public class DogBehaviour : MonoBehaviour {
 	}
 
 	void Update() {
-		// Probably need a state, (or check state elsewhere in GM,) where if the game isn't running and either the menu isn't open
+		// TODO: Probably need a state, (or check state elsewhere in GM,) where if the game isn't running and either the menu isn't open
 		// or hasn't been interacted with for some time, play an attention sound.
+
+		// The menu buttons may have been hidden while we were playing a game, so unhide them
+		if (GM.GetState () == GM.GameState.GS_MENU)
+			ShowMenuButtons (true);
 	}
 
 	// Makes the dog bark when he or a menu item is clicked
 	public void OnSelect() {
 		PlaySound(select_sounds_);
-		// Change state? Show menu?
+		menu_.SetActive (!menu_.activeSelf);
+	}
+
+	// Start a game
+	public void OnLeftButton() {
+		PlaySound(select_sounds_);
+		ShowMenuButtons(false);
+		// TODO: This should check for the game mode we've selected using the right button
+		GM.ChangeState (GM.GameState.GS_TIMER);
+	}
+
+	// TODO: Change Game Mode
+	public void OnRightButton() {
+		PlaySound(select_sounds_);
+		//ShowMenuButtons(false);
+		// TODO: Would want to change the mode-to-play state
+		// TODO: Change the logo on the button for different modes, (icons would be better than button text.)
+		// TODO: Would also want to make the buttons look like speech bubbles...
+	}
+
+	public void ShowMenuButtons(bool visible = true) {
+		leftButton_.SetActive(visible);
+		rightButton_.SetActive(visible);
 	}
 
 	void PlaySound(List<AudioClip> sounds) {

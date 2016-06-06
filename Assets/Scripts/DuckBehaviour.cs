@@ -126,6 +126,8 @@ public class DuckBehaviour : MonoBehaviour {
 		death_timer_ = 0.25f;
 
 		PlaySound(hit_sounds_);
+
+		GM.TargetHit ();
 	}
 
 	public Waypoint FindNearestWaypoint() {

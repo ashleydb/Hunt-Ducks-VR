@@ -152,5 +152,16 @@ public class ObjectPool : MonoBehaviour
         }
         else
             Debug.Log("Attempting to destroy object not in pool.");
-    }
+	}
+
+	// Deactivate all objects in the active list and put them back in our inactive list for reuse
+	public void DestroyAllActive()
+	{
+		foreach (GameObject obj in active_pool_)
+		{
+			obj.SetActive(false);
+			pool_.Add(obj);
+			active_pool_.Remove(obj);
+		}
+	}
 }
