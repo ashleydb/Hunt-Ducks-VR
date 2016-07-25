@@ -4,9 +4,21 @@ using System.Collections;
 public class LeafParticleBehaviour : MonoBehaviour
 {
     float death_timer_ = -5.0f;
+<<<<<<< Updated upstream
     
+=======
+
+	// Not needed since we just use the "Play on Awake" setting
+	//private GvrAudioSource audio_source_;
+
+>>>>>>> Stashed changes
 	void OnEnable() {
+		//audio_source_ = GetComponent<GvrAudioSource>();
 		death_timer_ = 5.0f;
+<<<<<<< Updated upstream
+=======
+		//PlaySound ();
+>>>>>>> Stashed changes
 	}
 
 	void Update ()
@@ -20,5 +32,18 @@ public class LeafParticleBehaviour : MonoBehaviour
 			}
 		}
 	}
+<<<<<<< Updated upstream
+=======
+
+	/*
+	void PlaySound() {
+		if (audio_source_ == null)
+			return;
+
+		audio_source_.loop = false;
+		audio_source_.Play();
+	}
+	*/
+>>>>>>> Stashed changes
 }
 

@@ -34,6 +34,7 @@ public class DuckBehaviour : MonoBehaviour {
 		NextNode = FindNearestWaypoint();
 		talk_timer_ = Random.Range (7, 15); // Make the duck quack as it flies after some amount of time
 		StartCoroutine(PlayAwakeSound());
+		death_timer_ = -1.0f;
 	}
 
 	IEnumerator PlayAwakeSound() {
@@ -47,10 +48,14 @@ public class DuckBehaviour : MonoBehaviour {
 			// Duck is dying so remove from scene after some time
 			death_timer_ -= Time.deltaTime;
 			if (death_timer_ <= 0.0f) {
+				// Reset the death timer
+				death_timer_ = -1.0f;
+
 				Rigidbody rigidbody = GetComponent<Rigidbody>();
 				if (rigidbody != null) {
 					rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
 				}
+
                 // Make sure the pool object is tagged appropriately in the editor, (FindWithTag is quicker than Find using strings)
                 ObjectPool pool = GameObject.FindWithTag("DuckPool").GetComponent<ObjectPool>();
                 pool.Destroy(gameObject);
@@ -119,15 +124,18 @@ public class DuckBehaviour : MonoBehaviour {
 */
 	// Spawns some particles and hides the duck
 	public void OnShot() {
-        // Make sure the pool object is tagged appropriately in the editor, (FindWithTag is quicker than Find using strings)
-        ObjectPool pool = GameObject.FindWithTag("HitParticlePool").GetComponent<ObjectPool>();
-        pool.Create(transform.position);
+		// Only if we haven't been shot already
+		if (death_timer_ == -1.0f) {
+			// Make sure the pool object is tagged appropriately in the editor, (FindWithTag is quicker than Find using strings)
+			ObjectPool pool = GameObject.FindWithTag ("HitParticlePool").GetComponent<ObjectPool> ();
+			pool.Create (transform.position);
 
-		death_timer_ = 0.25f;
+			death_timer_ = 0.25f;
 
-		PlaySound(hit_sounds_);
+			PlaySound (hit_sounds_);
 
-		GM.TargetHit ();
+			GM.TargetHit ();
+		}
 	}
 
 	public Waypoint FindNearestWaypoint() {
